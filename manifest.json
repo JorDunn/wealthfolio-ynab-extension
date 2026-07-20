@@ -1,0 +1,71 @@
+{
+  "id": "wealthfolio-ynab-sync",
+  "name": "YNAB Sync",
+  "version": "0.1.0",
+  "description": "Sync transactions from YNAB into Wealthfolio cash accounts",
+  "author": "Jordan Dunn / NodeTwo",
+  "main": "dist/addon.js",
+  "sdkVersion": "3.6.1",
+  "minWealthfolioVersion": "3.6.1",
+  "enabled": true,
+  "contributes": {
+    "routes": [
+      {
+        "id": "wealthfolio-ynab-sync"
+      }
+    ],
+    "links": {
+      "sidebar": [
+        {
+          "id": "wealthfolio-ynab-sync",
+          "route": "wealthfolio-ynab-sync",
+          "label": "YNAB Sync",
+          "icon": "arrows-clockwise",
+          "order": 100
+        }
+      ]
+    }
+  },
+  "hostDependencies": {
+    "@tanstack/react-query": "^5.90.0",
+    "@wealthfolio/addon-sdk": "^3.6.1",
+    "@wealthfolio/ui": "^3.6.0",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.561.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "recharts": "^3.7.0"
+  },
+  "permissions": {
+    "accounts": [
+      "getAll"
+    ],
+    "activities": [
+      "getAll",
+      "search",
+      "create",
+      "update"
+    ],
+    "network": [
+      "request"
+    ],
+    "secrets": [
+      "set",
+      "get",
+      "delete"
+    ]
+  },
+  "network": {
+    "allowedHosts": [
+      "api.ynab.com"
+    ]
+  },
+  "keywords": [
+    "wealthfolio",
+    "addon",
+    "ynab",
+    "sync",
+    "transactions"
+  ],
+  "license": "AGPL-3.0-only"
+}

@@ -1,0 +1,41 @@
+{
+  "id": "test-budget-id",
+  "name": "Test Budget",
+  "lastModifiedOn": "2026-07-20T00:00:00Z",
+  "dateFormat": {
+    "format": "MM/DD/YYYY"
+  },
+  "currencyFormat": {
+    "iso_code": "USD",
+    "example_format": "1,234.56",
+    "decimal_digits": 2,
+    "decimal_separator": ".",
+    "thousands_separator": ",",
+    "symbol_first": true,
+    "symbol": "$",
+    "display_symbol": true
+  },
+  "accounts": [
+    {
+      "id": "test-account-id",
+      "name": "Checking",
+      "type": "checking",
+      "onBudget": true,
+      "closed": false,
+      "note": null,
+      "balance": 100000,
+      "clearedBalance": 100000,
+      "unclearedBalance": 0,
+      "transferPayeeId": null,
+      "directImportLinked": false,
+      "directImportInProgress": false,
+      "lastReconciliationDate": null,
+      "deleted": false
+    }
+  ],
+  "payees": [],
+  "categoryGroups": [],
+  "categories": [],
+  "months": [],
+  "transactions": []
+}
