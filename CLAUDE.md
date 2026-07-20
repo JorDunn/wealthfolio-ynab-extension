@@ -61,7 +61,16 @@ Wealthfolio cash accounts. Target deployment: self-hosted Wealthfolio Docker
 - Do not accept vendored/copied third-party code without recording its
   origin and license in the file header.
 
-## Versioning
+## Versioning & commits
 
-Semver, starting 0.1.0. Keep a Changelog format in `CHANGELOG.md`. Version
-bumps touch `manifest.json` and `package.json` together.
+Semver, starting 0.1.0. Releases are automated by release-please
+(`release-please-config.json`): its release PR bumps `manifest.json` and
+`package.json` together and writes the `CHANGELOG.md` entry — never
+hand-bump versions or hand-edit released changelog sections.
+
+Commit messages MUST use Conventional Commits: `feat:` (minor), `fix:`
+(patch), and non-releasing types `docs:`, `test:`, `refactor:`, `ci:`,
+`build:`, `chore:`; breaking changes use `!` or a `BREAKING CHANGE:`
+footer (pre-1.0 these bump minor, per `bump-minor-pre-major`). Stage
+commits that add addon functionality use `feat:` so they reach the
+changelog (e.g. `feat: stage 3 sync core`).
