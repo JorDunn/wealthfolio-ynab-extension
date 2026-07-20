@@ -2,133 +2,116 @@
 // Copyright (C) 2026 Jordan Dunn / NodeTwo
 
 /**
- * YNAB API types and interfaces.
+ * YNAB API v1 wire types (https://api.ynab.com/v1).
+ *
+ * These mirror the *actual* JSON field names YNAB returns (snake_case,
+ * milliunit amounts, numeric server_knowledge cursor) rather than a
+ * camelCased re-interpretation. Keeping the wire shape here means the
+ * client (src/ynab/client.ts) can parse a response body with a direct
+ * `JSON.parse` + type assertion, with zero silent field-name drift between
+ * what YNAB sends and what this addon reads.
+ *
+ * Deviation note (Stage 3): the Stage 2 scaffold's `types.ts` used camelCase
+ * field names (`lastModifiedOn`, `categoryGroupId`, ...) that do not match
+ * YNAB's actual API response shape at all. Replaced wholesale.
  */
 
-export interface Budget {
-  id: string;
-  name: string;
-  lastModifiedOn: string;
-  dateFormat: {
-    format: string;
-  };
-  currencyFormat: {
-    iso_code: string;
-    example_format: string;
-    decimal_digits: number;
-    decimal_separator: string;
-    thousands_separator: string;
-    symbol_first: boolean;
-    symbol: string;
-    display_symbol: boolean;
-  };
-  accounts: Account[];
-  payees: Payee[];
-  categoryGroups: CategoryGroup[];
-  categories: Category[];
-  months: MonthDetail[];
-  transactions: Transaction[];
+export interface YnabCurrencyFormat {
+  iso_code: string;
+  example_format: string;
+  decimal_digits: number;
+  decimal_separator: string;
+  symbol_first: boolean;
+  group_separator: string;
+  currency_symbol: string;
+  display_symbol: boolean;
 }
 
-export interface Account {
+/** GET /budgets summary entry (and the shape embedded in /budgets/{id}). */
+export interface YnabBudgetSummary {
   id: string;
   name: string;
-  type: string;
-  onBudget: boolean;
+  last_modified_on: string | null;
+  first_month: string | null;
+  last_month: string | null;
+  currency_format: YnabCurrencyFormat | null;
+}
+
+export type YnabAccountType =
+  | 'checking'
+  | 'savings'
+  | 'cash'
+  | 'creditCard'
+  | 'lineOfCredit'
+  | 'otherAsset'
+  | 'otherLiability'
+  | 'mortgage'
+  | 'autoLoan'
+  | 'studentLoan'
+  | 'personalLoan'
+  | 'medicalDebt'
+  | 'otherDebt';
+
+export interface YnabAccount {
+  id: string;
+  name: string;
+  type: YnabAccountType;
+  on_budget: boolean;
   closed: boolean;
   note: string | null;
   balance: number;
-  clearedBalance: number;
-  unclearedBalance: number;
-  transferPayeeId: string;
-  directImportLinked: boolean;
-  directImportInProgress: boolean;
-  lastReconciliationDate: string | null;
+  cleared_balance: number;
+  uncleared_balance: number;
+  transfer_payee_id: string | null;
   deleted: boolean;
 }
 
-export interface Payee {
+export type YnabClearedStatus = 'cleared' | 'uncleared' | 'reconciled';
+
+export interface YnabSubtransaction {
   id: string;
-  name: string;
-  transferAccountId: string | null;
+  transaction_id: string;
+  amount: number;
+  memo: string | null;
+  payee_id: string | null;
+  payee_name: string | null;
+  category_id: string | null;
+  category_name: string | null;
+  transfer_account_id: string | null;
+  transfer_transaction_id: string | null;
   deleted: boolean;
 }
 
-export interface CategoryGroup {
-  id: string;
-  name: string;
-  hidden: boolean;
-  deleted: boolean;
-  categories: Category[];
-}
-
-export interface Category {
-  id: string;
-  categoryGroupId: string;
-  name: string;
-  hidden: boolean;
-  originalCategoryGroupId: string | null;
-  note: string | null;
-  budgeted: number;
-  activity: number;
-  balance: number;
-  goalType: string | null;
-  goalDay: number | null;
-  goalCadenceFrequency: number | null;
-  goalCadence: string | null;
-  goalTarget: number | null;
-  goalUnderFunded: number | null;
-  isClosed: boolean;
-  deleted: boolean;
-}
-
-export interface MonthDetail {
-  month: string;
-  note: string | null;
-  income: number;
-  budgeted: number;
-  activity: number;
-  balance: number;
-  toBeBudgeted: number;
-  ageOfMoney: number | null;
-}
-
-export interface Transaction {
+/** A YNAB transaction as returned by the transactions delta endpoint. */
+export interface YnabTransaction {
   id: string;
   date: string;
-  payeeId: string | null;
-  payeeName: string | null;
-  categoryId: string | null;
-  categoryName: string | null;
-  approved: boolean;
-  cleared: 'cleared' | 'uncleared' | 'reconciled';
-  flaggedColor: string | null;
+  /** Milliunits, signed: negative = outflow, positive = inflow. */
   amount: number;
   memo: string | null;
-  accountId: string;
-  accountName: string;
-  transferAccountId: string | null;
-  transferTransactionId: string | null;
-  matchedTransactionId: string | null;
-  importId: string | null;
-  importPayeeOriginalName: string | null;
-  importPayeeName: string | null;
-  importPayeeNameOriginal: string | null;
+  cleared: YnabClearedStatus;
+  approved: boolean;
+  flag_color: string | null;
+  account_id: string;
+  account_name: string;
+  payee_id: string | null;
+  payee_name: string | null;
+  category_id: string | null;
+  category_name: string | null;
+  transfer_account_id: string | null;
+  transfer_transaction_id: string | null;
+  matched_transaction_id: string | null;
+  import_id: string | null;
   deleted: boolean;
-  subtransactions: Subtransaction[];
+  subtransactions: YnabSubtransaction[];
 }
 
-export interface Subtransaction {
-  id: string;
-  transactionId: string;
-  amount: number;
-  memo: string | null;
-  payeeId: string | null;
-  payeeName: string | null;
-  categoryId: string | null;
-  categoryName: string | null;
-  transferAccountId: string | null;
-  transferTransactionId: string | null;
-  matchedTransactionId: string | null;
-  deleted: boolean;
+/** GET /budgets/{id}/transactions response payload (`data`). */
+export interface YnabTransactionsData {
+  transactions: YnabTransaction[];
+  server_knowledge: number;
+}
+
+export interface YnabBudgetSettings {
+  currency_format: YnabCurrencyFormat | null;
 }

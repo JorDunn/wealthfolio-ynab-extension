@@ -7,12 +7,18 @@ import { getBudgetStateKey, getUserConfigKey } from './schema';
 /**
  * State store for managing sync state and user configuration.
  * Uses ctx.api.storage for persistence.
+ *
+ * Deviation note (Stage 3): the Stage 2 stub's `StorageAPI` had `get():
+ * Promise<string | undefined>` and a `remove()` method. The installed
+ * `@wealthfolio/addon-sdk` (3.6.2) `StorageAPI` returns `string | null` from
+ * `get()` and calls the delete method `delete()`, not `remove()`. Matched to
+ * the real shape below.
  */
 
 export interface StorageAPI {
-  get(key: string): Promise<string | undefined>;
+  get(key: string): Promise<string | null>;
   set(key: string, value: string): Promise<void>;
-  remove(key: string): Promise<void>;
+  delete(key: string): Promise<void>;
 }
 
 export class StateStore {
