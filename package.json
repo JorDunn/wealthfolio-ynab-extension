@@ -1,6 +1,6 @@
 {
   "name": "wealthfolio-ynab-sync-addon",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "YNAB transaction sync addon for Wealthfolio",
   "type": "module",
   "main": "dist/addon.js",

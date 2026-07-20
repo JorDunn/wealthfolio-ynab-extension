@@ -1,7 +1,7 @@
 {
   "id": "wealthfolio-ynab-sync",
   "name": "YNAB Sync",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Sync transactions from YNAB into Wealthfolio cash accounts",
   "author": "Jordan Dunn / NodeTwo",
   "main": "dist/addon.js",
@@ -39,22 +39,35 @@
   "permissions": [
     {
       "category": "accounts",
-      "functions": ["getAll"],
+      "functions": [
+        "getAll"
+      ],
       "purpose": "List Wealthfolio accounts to map YNAB accounts onto."
     },
     {
       "category": "activities",
-      "functions": ["getAll", "search", "create", "update"],
+      "functions": [
+        "getAll",
+        "search",
+        "create",
+        "update"
+      ],
       "purpose": "Read existing activities for dedup and create/update imported YNAB cash transactions."
     },
     {
       "category": "network",
-      "functions": ["request"],
+      "functions": [
+        "request"
+      ],
       "purpose": "Fetch budgets and transactions from api.ynab.com."
     },
     {
       "category": "secrets",
-      "functions": ["set", "get", "delete"],
+      "functions": [
+        "set",
+        "get",
+        "delete"
+      ],
       "purpose": "Store the YNAB personal access token securely."
     }
   ],
