@@ -3,7 +3,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { AddonContext, AddonEnableFunction } from '@wealthfolio/addon-sdk';
-import { Card, CardContent } from '@wealthfolio/ui';
+import { SyncPage } from './ui/SyncPage';
 
 // The host owns a single React root per addon and mounts the route `component`
 // itself (`createElement(Component, { location })`) with no access to the addon
@@ -11,43 +11,42 @@ import { Card, CardContent } from '@wealthfolio/ui';
 // (Do NOT call createRoot yourself — the host manages the lifecycle.)
 let addonCtx: AddonContext | undefined;
 
-function AddonExample({ ctx }: { ctx: AddonContext }) {
-  return (
-    <div className="p-6">
-      <Card>
-        <CardContent className="p-6">
-          <h1 className="text-2xl font-semibold mb-2">YNAB Sync</h1>
-          <p className="text-muted-foreground">
-            Sync transactions from YNAB into Wealthfolio cash accounts
-          </p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
 // Route component. The sidebar entry + route are declared in manifest.json
-// (`contributes.routes` + `contributes.links`), so the host renders navigation
-// without booting the addon; this component only runs when the route is first
-// visited. The QueryClientProvider shares one cache across route navigations.
+// (`contributes.routes` + `contributes.links`) — this is the mechanism the
+// installed `@wealthfolio/addon-sdk` (3.6.2) actually consumes: routes are
+// "host-renderable before the addon boots" and links place them in a host
+// slot (`AddonContributedRoute`/`AddonContributedLink` in
+// `node_modules/@wealthfolio/addon-sdk/dist/src/manifest.d.ts`). There is no
+// separate imperative `ctx.sidebar.addItem()` call needed for a route
+// already declared in `contributes.links.sidebar` — that API exists for
+// addons that want to add sidebar entries not backed by a durable route
+// (unused here). `ctx.router.add()` still runs at addon-enable time to
+// register the actual component for the route id the manifest declared;
+// the route `id` below MUST match `contributes.routes[].id` in manifest.json.
+// The QueryClientProvider shares one cache across route navigations.
 const AddonRoute = () => (
   <QueryClientProvider client={addonCtx!.api.query.getClient() as QueryClient}>
-    <AddonExample ctx={addonCtx!} />
+    <SyncPage ctx={addonCtx!} />
   </QueryClientProvider>
 );
 
 const enable: AddonEnableFunction = (ctx) => {
   addonCtx = ctx;
 
-  // The route `id` MUST match `contributes.routes[].id` in manifest.json.
-  // The host derives this root path from the manifest addon id.
   ctx.router.add({
     id: 'wealthfolio-ynab-sync',
     component: AddonRoute,
     path: '/addons/wealthfolio-ynab-sync',
   });
 
-  // The host owns the React root, so there is nothing to unmount here.
+  // The host owns the React root and un-mounts it on disable, and there is
+  // no cancellation token threaded through `ctx.api.network.request` /
+  // `SyncEngine.sync()` for an in-flight sync to hook into — so the only
+  // cleanup this addon can honestly do is drop its reference to `ctx` (any
+  // in-flight promise chain still resolves, but its `setState` calls target
+  // an unmounted component and React discards them; nothing writes to
+  // storage/secrets/activities after disable that wasn't already committed
+  // before the callback ran).
   ctx.onDisable(() => {
     addonCtx = undefined;
   });
