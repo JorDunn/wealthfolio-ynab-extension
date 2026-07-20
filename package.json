@@ -18,7 +18,7 @@
     "dev:server": "wealthfolio dev",
     "test": "vitest",
     "clean": "rm -rf dist",
-    "package": "mkdir -p dist && find dist -name '*.map' -delete && rm -f dist/*.zip && zip -r dist/$npm_package_name-$npm_package_version.zip manifest.json dist/ README.md -x '*.map'",
+    "package": "mkdir -p dist && find dist -name '*.map' -delete && rm -f dist/*.zip && zip -r dist/$npm_package_name-$npm_package_version.zip manifest.json dist/ README.md LICENSE CHANGELOG.md -x '*.map'",
     "bundle": "npm run clean && npm run build && npm run package",
     "lint": "tsc --noEmit",
     "type-check": "tsc --noEmit"

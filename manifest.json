@@ -5,8 +5,8 @@
   "description": "Sync transactions from YNAB into Wealthfolio cash accounts",
   "author": "Jordan Dunn / NodeTwo",
   "main": "dist/addon.js",
-  "sdkVersion": "3.6.1",
-  "minWealthfolioVersion": "3.6.1",
+  "sdkVersion": "3.6.2",
+  "minWealthfolioVersion": "3.6.2",
   "enabled": true,
   "contributes": {
     "routes": [
@@ -28,7 +28,7 @@
   },
   "hostDependencies": {
     "@tanstack/react-query": "^5.90.0",
-    "@wealthfolio/addon-sdk": "^3.6.1",
+    "@wealthfolio/addon-sdk": "^3.6.2",
     "@wealthfolio/ui": "^3.6.0",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.561.0",
@@ -36,25 +36,28 @@
     "react-dom": "^19.2.0",
     "recharts": "^3.7.0"
   },
-  "permissions": {
-    "accounts": [
-      "getAll"
-    ],
-    "activities": [
-      "getAll",
-      "search",
-      "create",
-      "update"
-    ],
-    "network": [
-      "request"
-    ],
-    "secrets": [
-      "set",
-      "get",
-      "delete"
-    ]
-  },
+  "permissions": [
+    {
+      "category": "accounts",
+      "functions": ["getAll"],
+      "purpose": "List Wealthfolio accounts to map YNAB accounts onto."
+    },
+    {
+      "category": "activities",
+      "functions": ["getAll", "search", "create", "update"],
+      "purpose": "Read existing activities for dedup and create/update imported YNAB cash transactions."
+    },
+    {
+      "category": "network",
+      "functions": ["request"],
+      "purpose": "Fetch budgets and transactions from api.ynab.com."
+    },
+    {
+      "category": "secrets",
+      "functions": ["set", "get", "delete"],
+      "purpose": "Store the YNAB personal access token securely."
+    }
+  ],
   "network": {
     "allowedHosts": [
       "api.ynab.com"
